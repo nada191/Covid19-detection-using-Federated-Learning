@@ -7,7 +7,7 @@ from typing import Callable, Dict
 import json
 import socket
 
-from preprocess_model import vgg_model
+from server.preprocess_model import vgg_model
 
 model = vgg_model()
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])

@@ -1,4 +1,4 @@
-
+import numpy as np
 from keras.applications.vgg16 import VGG16
 from keras.layers import Flatten
 from keras.models import Model
@@ -8,7 +8,6 @@ from keras.layers import Dense
 import pandas as pd
 import os
 from sklearn.model_selection import train_test_split
-
 
 def preprocess(data_path, number):  # data_path
     i=0
@@ -60,3 +59,20 @@ def vgg_model():
     return model
 
 
+def load_last_global_model_weights(weights_directory):
+    """
+    loads the last received weights in the directory
+    in which the global model weights are saved
+    """
+    # files list will contain the paths to the npy files in the directory
+    files_list=[]
+    # check every file under the root directory to have .npy extension
+    for root, dirs, files in os.walk(weights_directory, topdown = False):
+        for file in files:
+            if file.endswith(".npy"):
+                files_list.append(os.path.join(root,file))
+    # get the latest file
+    latest_weights_file = max(files_list, key=os.path.getmtime)
+    # load the weights from the file
+    weights=np.load(latest_weights_file,allow_pickle=True)
+    return weights

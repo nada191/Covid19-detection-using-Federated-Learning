@@ -1,30 +1,34 @@
 import argparse
-import time
+import datetime as dt
+import os
 
 from keras.applications import vgg16
 from keras_preprocessing.image import ImageDataGenerator
 import json
 
-from FLstrategies import *
+# from FLstrategies import *
 
 # from fastapi.middleware.cors import CORSMiddleware
+from server.FLstrategies import *
+    # SaveModelStrategy, get_on_fit_config_fn, evaluate_config
 
+# parser = argparse.ArgumentParser(description='Test.')
+# parser.add_argument('--rounds', action='store', type=int, help='number of rounds')
+# parser.add_argument('--@ip', action='store', type=str, help='ip address')
+# parser.add_argument('--port', action='store', type=int, help='port')
+# parser.add_argument('--resume', action='store', type=bool, help='resume from the previous weights')
+# parser.add_argument('--test_path', action='store', type=str, help='test data to do a server-side evaluation')
+# args = parser.parse_args()
+# num_rounds, ipaddress, port, resume, test_path = vars(args)["rounds"], vars(args)["@ip"], vars(args)["port"], \
+#                                                  vars(args)["resume"], vars(args)['test_path']
 
-parser = argparse.ArgumentParser(description='Test.')
-parser.add_argument('--rounds', action='store', type=int, help='number of rounds')
-parser.add_argument('--@ip', action='store', type=str, help='ip address')
-parser.add_argument('--port', action='store', type=int, help='port')
-parser.add_argument('--resume', action='store', type=bool, help='resume from the previous weights')
-parser.add_argument('--test_path', action='store', type=str, help='test data to do a server-side evaluation')
-args = parser.parse_args()
-num_rounds, ipaddress, port, resume, test_path = vars(args)["rounds"], vars(args)["@ip"], vars(args)["port"], \
-                                                 vars(args)["resume"], vars(args)['test_path']
-
-
+test_path ='/Users/macbookair/Desktop/fl-dataset/4'
 def launch_fl_session(num_rounds: int, ipaddress: str, port: int, resume: bool):
     """
     """
-    session = str(time.time())
+    today = dt.datetime.today()
+    session = today.strftime("%d-%m-%Y-%H-%M")
+
     with open('config_training.json', 'r+') as file:
         config = json.load(file)
         data = {'num_rounds': num_rounds, "resume": resume, "session": session}
@@ -49,12 +53,12 @@ def launch_fl_session(num_rounds: int, ipaddress: str, port: int, resume: bool):
     if (resume and len(sessions) != 0):
         # test if we will start def get_eval_fn(model):
         # if we have at least a session directory
-        if os.path.exists(f'./fl_sessions/{sessions[-1]}/global_session_model.npy'):
+        if os.path.exists(f'./fl_sessions/{sessions[-1]}/round-weights.npy'):
             # if the latest session directory contains the global model parameters
-            initial_parameters = np.load(f"./fl_sessions/{sessions[-1]}/global_session_model.npy", allow_pickle=True)
+            initial_parameters = np.load(f"./fl_sessions/{sessions[-1]}/round-weights.npy", allow_pickle=True)
             initial_params = initial_parameters[0]
             # load latest session's global model parameters
-    with open('strategy_coefs.json ', 'r') as file:
+    with open('/Users/macbookair/Desktop/Projet_pfe-main/server/strategy_coefs.json', 'r') as file:
         config = json.load(file)
         data = json.dumps(config)
         data = json.loads(data)
@@ -116,4 +120,6 @@ def get_eval_fn(model):
     return evaluate
 
 
-launch_fl_session(num_rounds, ipaddress, port, resume)
+# launch_fl_session(num_rounds, ipaddress, port, resume)
+
+# python server/server.py --rounds 2 --@ip "localhost" --port 8080 --resume True --test_path "/Users/macbookair/Desktop/fl-dataset/3"
